@@ -64,8 +64,14 @@ div .iqual{
   color: white;
 }
 .continue{
-  transition: ease 1s;
+  transition: transform 0.5s ease, opacity 0.5s ease;
   transform: scale(2); 
   opacity: 1;
-  transform: translateY(-63px);
+  transform: translateY(-63px); 
 }
+
+/* ELEMENTOS POR SOLUCIONAR */
+/* 
+1. Cuando sumas sin dar igual no funciona correctamente.
+2. Los parentesis se omiten completamente.
+*/

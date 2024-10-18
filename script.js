@@ -50,6 +50,7 @@ function operar(n1, simbolo, n2){
     res.classList.add("continue");
 }
 
+let c // contador para el case ("( )")
 calculadora.addEventListener('click', (e) =>{
   console.log(e.target);
   
@@ -118,7 +119,19 @@ calculadora.addEventListener('click', (e) =>{
       showHistory();
       break;
     case "( )":
-      digito1.append("()"); // corregir para que sea uno de apertura y uno de cierre.
+       if (operador.textContent !== "" && c != 1){
+        digito2.append("(")
+        c = 1
+       } else if (operador.textContent !== "" && c == 1){
+        digito2.append(")")
+        c = 0
+       } else if (operador.textContent === "" && c != 1){
+        digito1.append("(")
+        c = 1
+       } else {
+        digito1.append(")")
+        c = 0
+       }
       break;
     case "%":
       if (digito2.textContent !== "") { // No esta funcionando
