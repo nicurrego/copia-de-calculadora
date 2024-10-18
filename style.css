@@ -20,6 +20,15 @@ section{
   color: aqua;
   align-items: flex-end;
 }
+#n1{
+  color: salmon;
+}
+#operador{
+  color: greenyellow
+}
+#n2{
+  color: cornflowerblue;
+}
 #resultado{
   margin-top: 5px;
   font-size: .5em;
