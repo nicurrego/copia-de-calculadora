@@ -12,22 +12,17 @@ section{
   padding: 10px;
 }
 .pantalla{
-  font-size: 2.2em;
+  font-size: 2em;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   width: 100%;
   min-height: 100px;
   color: aqua;
   align-items: flex-end;
 }
-#n1{
-  color: salmon;
-}
 #operador{
-  color: greenyellow
-}
-#n2{
-  color: cornflowerblue;
+  color: #ee82eeb6;
 }
 #resultado{
   margin-top: 5px;
@@ -46,6 +41,7 @@ section{
 }
 
 .calculadora div{
+  cursor: pointer;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -66,4 +62,10 @@ div .clear{
 div .iqual{
   background-color: #ee82eeb6;
   color: white;
+}
+.continue{
+  transition: ease 1s;
+  transform: scale(2); 
+  opacity: 1;
+  transform: translateY(-63px);
 }

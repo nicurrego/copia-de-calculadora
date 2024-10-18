@@ -26,7 +26,8 @@ const calculadora = document.querySelector("div.calculadora");
 const res = document.getElementById("resultado")
 
 function operar(n1, simbolo, n2){
-    let resultado;
+  
+  let resultado;
     n1 = parseFloat(n1) // sin este paso js tomará los numeros como texto
     n2 = parseFloat(n2)
     switch (simbolo) {
@@ -41,109 +42,150 @@ function operar(n1, simbolo, n2){
       default: resultado = "simbolo inexistente"
       break
     } 
-    res.textContent = resultado
-    console.log(resultado)
+    digito1.textContent = ""
+    operador.textContent = ""
+    digito2.textContent = ""
+    res.textContent = resultado;
+    res.removeAttribute("id");
+    res.classList.add("continue");
 }
 
 
 
 calculadora.addEventListener('click', (e) =>{
-  const o = "digito1.textContent, operador.textContent, digito2.textContent"
-  switch (e.target.id) {
-    case "c":  digito1.textContent = "";
-    operador.textContent = "";
-    digito2.textContent = "";
-    resultado.textContent = "";
-    break;
-    case "=":  operar(o) ; // añadí la funcion de operar en caso de que el usuario digite un operador luego de haber digitado el n2.
-    break;
-    case "+": if(digito2.textContent !== ""){
-      operar(o);
-      operador.append("+")
-    } else{
-      operador.textContent = ""
-      operador.append("+")
+  if (res.id === ""){
+    res.id = "resultado"
+    res.classList.remove("continue")
+    digito1.textContent = res.textContent
+    res.textContent = ""
+  }else{
+    const o = {　// con este array puedo simplificar la escritura de mi codigo
+      n1: digito1.textContent,
+      operador: operador.textContent,
+      n2: digito2.textContent
     };
-    break;
-    case "-":  operador.append("-");
-    break;
-    case "*":  operador.append("*");
-    break;
-    case "/":  operador.append("/");
-    break;
-    case "+/-":  nose;
-    break;
-    case "history":  showHistory();
-    break;
-    case "( )":  digito1.append("()"); //corregir para que sea uno de apertura y uno de cierre.
-    break;
-    case "%":  digito1.append("%"); 
-    break;
-    case ".":  if(digito1.textContent === ""){
-      digito1.append("0.")
-    } else{
-      digito1.append(".")
-    };  
-    break;
-    case "0": if(operador.textContent === ""){
-      digito1.append("0")
-    } else {
-      digito2.append("0")
-    };
-    break;
-    case "1":  if(operador.textContent === ""){
-      digito1.append(1)
-    } else {
-      digito2.append(1)
-    };
-    break;
-    case "2":  if(operador.textContent === ""){
-      digito1.append("2")
-    } else {
-      digito2.append("2")
-    };
-    break;
-    case "3":  if(operador.textContent === ""){
-      digito1.append("3")
-    } else {
-      digito2.append("3")
-    };
-    break;
-    case "4":  if(operador.textContent === ""){
-      digito1.append("4")
-    } else {
-      digito2.append("4")
-    };
-    break;
-    case "5":  if(operador.textContent === ""){
-      digito1.append("5")
-    } else {
-      digito2.append("5")
-    };
-    break;
-    case "6":  if(operador.textContent === ""){
-      digito1.append("6")
-    } else {
-      digito2.append("6")
-    };
-    break;
-    case "7":  if(operador.textContent === ""){
-      digito1.append("7")
-    } else {
-      digito2.append("7")
-    };
-    break;
-    case "8":  if(operador.textContent === ""){
-      digito1.append("8")
-    } else {
-      digito2.append("8")
-    };
-    break;
-    case "9":  if(operador.textContent === ""){
-      digito1.append("9")
-    } else {
-      digito2.append("9")
-    };
-    break;
+    switch (e.target.id) {
+      case "c":
+        res.textContent = "";
+        digito1.textContent = "";
+        operador.textContent = "";
+        digito2.textContent = "";
+        break;
+      case "=":  
+        operar(o.n1, o.operador, o.n2);
+      break;
+      case "+": if(digito2.textContent !== ""){
+        operar(o.n1, o.operador, o.n2);
+        operador.append("+")
+      } else{
+        operador.textContent = ""
+        operador.append("+")
+      };
+      break;
+      case "-":  if(digito2.textContent !== ""){
+        operar(o.n1, o.operador, o.n2);
+        operador.append("-")
+      } else{
+        operador.textContent = ""
+        operador.append("-")
+      }
+      break;
+      case "*":  if(digito2.textContent !== ""){
+        operar(o.n1, o.operador, o.n2);
+        operador.append("*")
+      } else{
+        operador.textContent = ""
+        operador.append("*")
+      }
+      break;
+      case "/":  if(digito2.textContent !== ""){
+        operar(o.n1, o.operador, o.n2);
+        operador.append("/")
+      } else{
+        operador.textContent = ""
+        operador.append("/")
+      }
+      break;
+      case "+/-":  nose;
+      break;
+      case "history":  showHistory();
+      break;
+      case "( )":  digito1.append("()"); //corregir para que sea uno de apertura y uno de cierre.
+      break;
+      case "%":  if(digito2.textContent !== ""){ // No esta funcionando
+        operar(o.n1, o.operador, o.n2);
+        operador.append("%")
+      } else{
+        operador.textContent = ""
+        operador.append("%")
+      }
+      break;
+      case ".":  if(digito1.textContent === ""){
+        digito1.append("0.")
+      } else{
+        digito1.append(".")
+      };  
+      break;
+      case "0": if(operador.textContent === ""){
+        digito1.append("0")
+      } else {
+        digito2.append("0")
+      };
+      break;
+      case "1":  if(operador.textContent === ""){
+        digito1.append(1)
+      } else {
+        digito2.append(1)
+      };
+      break;
+      case "2":  if(operador.textContent === ""){
+        digito1.append("2")
+      } else {
+        digito2.append("2")
+      };
+      break;
+      case "3":  if(operador.textContent === ""){
+        digito1.append("3")
+      } else {
+        digito2.append("3")
+      };
+      break;
+      case "4":  if(operador.textContent === ""){
+        digito1.append("4")
+      } else {
+        digito2.append("4")
+      };
+      break;
+      case "5":  if(operador.textContent === ""){
+        digito1.append("5")
+      } else {
+        digito2.append("5")
+      };
+      break;
+      case "6":  if(operador.textContent === ""){
+        digito1.append("6")
+      } else {
+        digito2.append("6")
+      };
+      break;
+      case "7":  if(operador.textContent === ""){
+        digito1.append("7")
+      } else {
+        digito2.append("7")
+      };
+      break;
+      case "8":  if(operador.textContent === ""){
+        digito1.append("8")
+      } else {
+        digito2.append("8")
+      };
+      break;
+      case "9":  if(operador.textContent === ""){
+        digito1.append("9")
+      } else {
+        digito2.append("9")
+      };
+      break;
+    }
   }
 })
