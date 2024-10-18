@@ -19,11 +19,11 @@ const cero = document.getElementById("0")
 const decimal = document.getElementById(".")
 const igual = document.getElementById("=")
 const history = document.getElementById("history")
-const digito = document.querySelector("span")
+const digito1 = document.getElementById("n1")
+const operador = document.getElementById("operador")
+const digito2 = document.getElementById("n2")
 const calculadora = document.querySelector("div.calculadora");
 
-
-console.log(siete);
 
 function operar(n1, simbolo, n2){
   {
