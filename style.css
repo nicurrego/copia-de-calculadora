@@ -69,6 +69,15 @@ div .iqual{
   opacity: 1;
   transform: translateY(-63px); 
 }
+.historial {
+  color: aqua;
+  position: absolute;
+  height: 205px;
+  background-color: black;
+  width: 172px;
+  top: 150px;
+  left: 575px;
+}
 
 /* ELEMENTOS POR SOLUCIONAR */
 /* 

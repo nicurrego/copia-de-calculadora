@@ -52,8 +52,6 @@ function operar(n1, simbolo, n2){
 
 let c // contador para el case ("( )")
 calculadora.addEventListener('click', (e) =>{
-  console.log(e.target);
-  
   if (res.classList.contains("continue")) {
     // Si el resultado está presente, reiniciar para una nueva operación
     digito1.textContent = res.textContent;
@@ -220,3 +218,24 @@ calculadora.addEventListener('click', (e) =>{
       break;
   }
 })
+
+let c2 = 0; // Inicializamos el contador
+let hola; // Declaramos la variable hola fuera del scope del evento
+
+history.addEventListener('click', () => { 
+  const section = document.querySelector("section");
+
+  if (c2 === 0) {
+    hola = document.createElement("section");
+    section.appendChild(hola);
+    hola.classList.add("historial");
+    hola.textContent = "Este es el historial"; // Puedes añadir cualquier contenido que desees
+    c2 = 1;
+  } else if (c2 === 1) {
+    hola.style.display = "none";
+    c2 = 2;
+  } else if (c2 === 2) {
+    hola.style.display = "block";
+    c2 = 1;
+  }
+});
