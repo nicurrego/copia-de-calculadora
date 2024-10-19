@@ -24,9 +24,11 @@ const operador = document.getElementById("operador") // color greenyellow
 const digito2 = document.getElementById("n2") // color violeta
 const calculadora = document.querySelector("div.calculadora");
 const res = document.getElementById("resultado")
+const contenidoHistorial = [];
 
 function operar(n1, simbolo, n2){
-  
+  contenidoHistorial.push([n1,simbolo,n2])
+  storehistorialInLocalStorage(contenidoHistorial)
   let resultado;
     n1 = parseFloat(n1) // sin este paso js tomará los numeros como texto
     n2 = parseFloat(n2)
@@ -50,6 +52,7 @@ function operar(n1, simbolo, n2){
     res.classList.add("continue");
 }
 
+// OPERACIONES DE CALCULADORA
 let c // contador para el case ("( )")
 calculadora.addEventListener('click', (e) =>{
   if (res.classList.contains("continue")) {
@@ -219,9 +222,10 @@ calculadora.addEventListener('click', (e) =>{
   }
 })
 
+
+// HISTORIAL
 let c2 = 0; // Inicializamos el contador
 let hola; // Declaramos la variable hola fuera del scope del evento
-
 history.addEventListener('click', () => { 
   const section = document.querySelector("section");
 
@@ -239,3 +243,10 @@ history.addEventListener('click', () => {
     c2 = 1;
   }
 });
+
+function storehistorialInLocalStorage(contenidoHistorial) {
+  const ope = JSON.parse(localStorage.getItem("ope") || "[]");
+
+  ope.push(contenidoHistorial);
+  localStorage.setItem("ope", JSON.stringify(ope));
+}

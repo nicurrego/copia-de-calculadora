@@ -72,11 +72,11 @@ div .iqual{
 .historial {
   color: aqua;
   position: absolute;
-  height: 205px;
+  min-height: 100px;
   background-color: black;
   width: 172px;
-  top: 150px;
-  left: 575px;
+  top: 50px;
+  left: 50px;
 }
 
 /* ELEMENTOS POR SOLUCIONAR */
