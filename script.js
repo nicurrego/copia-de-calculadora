@@ -1,30 +1,26 @@
 const buttons = ["c", "( )", "%", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "+/-", "0", ".", "=", "history"];
 const elements = {};
 
-// Selecciona todos los botones por su ID y los almacena en el objeto elements
 buttons.forEach(id => {
   elements[id] = document.getElementById(id);
 });
 
-const digito1 = document.getElementById("n1"); // color salmon
-const operador = document.getElementById("operador"); // color greenyellow
-const digito2 = document.getElementById("n2"); // color violeta
+const digito1 = document.getElementById("n1");
+const operador = document.getElementById("operador");
+const digito2 = document.getElementById("n2");
 const calculadora = document.querySelector("div.calculadora");
 const res = document.getElementById("resultado");
 const contenidoHistorial = [];
 
 function operar(n1, simbolo, n2) {
-  // Almacena la operación actual en el historial y en el localStorage
   const operacionActual = [n1, simbolo, n2];
   contenidoHistorial.push(operacionActual);
   storehistorialInLocalStorage(operacionActual);
 
   let resultado;
-  // Convierte los números de texto a float
   n1 = parseFloat(n1);
   n2 = parseFloat(n2);
 
-  // Realiza la operación según el símbolo
   switch (simbolo) {
     case "+":
       resultado = n1 + n2;
@@ -42,20 +38,17 @@ function operar(n1, simbolo, n2) {
       resultado = "simbolo inexistente";
       break;
   }
-  // Limpia los campos y muestra el resultado
-  digito1.textContent = "";
+  digito1.textContent = resultado;
   operador.textContent = "";
   digito2.textContent = "";
-  res.textContent = resultado;
+  res.textContent = "";
   res.removeAttribute("id");
   res.classList.add("continue");
 }
 
-// OPERACIONES DE CALCULADORA
-let c = 0; // contador para el manejo de paréntesis
+let parenthesesCounter = 0;
 calculadora.addEventListener('click', (e) => {
-  // Si el resultado está presente, reiniciar para una nueva operación
-  if (res.classList.contains("continue")) {
+  if (res.classList.contains("continue") && e.target.id !== "=" && e.target.id !== "c") {
     digito1.textContent = res.textContent;
     operador.textContent = "";
     digito2.textContent = "";
@@ -64,37 +57,38 @@ calculadora.addEventListener('click', (e) => {
     res.classList.remove("continue");
   }
 
-  // Objeto que contiene los valores actuales de la operación
   const o = {
     n1: digito1.textContent,
     operador: operador.textContent,
     n2: digito2.textContent
   };
 
-  // Maneja las distintas acciones según el botón presionado
   switch (e.target.id) {
     case "c":
-      // Limpia todos los campos
       res.textContent = "";
       digito1.textContent = "";
       operador.textContent = "";
       digito2.textContent = "";
       break;
     case "=":
-      // Realiza la operación si todos los valores están presentes
       if (o.n1 && o.operador && o.n2) {
         operar(o.n1, o.operador, o.n2);
       }
       break;
-    // Operadores matemáticos
     case "+":
     case "-":
     case "*":
     case "/":
-      operador.textContent = e.target.id;
+      if (digito2.textContent !== "") {
+        operar(o.n1, o.operador, o.n2);
+        operador.textContent = e.target.id;
+        digito2.textContent = "";
+        res.textContent = "";
+      } else {
+        operador.textContent = e.target.id;
+      }
       break;
     case "+/-":
-      // Cambia el signo del número
       if (operador.textContent === "") {
         digito1.textContent = parseFloat(digito1.textContent) * -1;
       } else {
@@ -102,27 +96,24 @@ calculadora.addEventListener('click', (e) => {
       }
       break;
     case "history":
-      // Muestra el historial
       showHistory();
       break;
     case "( )":
-      // Maneja la apertura y cierre de paréntesis
-      if (operador.textContent !== "" && c === 0) {
+      if (operador.textContent !== "" && parenthesesCounter === 0) {
         digito2.append("(");
-        c = 1;
-      } else if (operador.textContent !== "" && c === 1) {
+        parenthesesCounter = 1;
+      } else if (operador.textContent !== "" && parenthesesCounter === 1) {
         digito2.append(")");
-        c = 0;
-      } else if (operador.textContent === "" && c === 0) {
+        parenthesesCounter = 0;
+      } else if (operador.textContent === "" && parenthesesCounter === 0) {
         digito1.append("(");
-        c = 1;
+        parenthesesCounter = 1;
       } else {
         digito1.append(")");
-        c = 0;
+        parenthesesCounter = 0;
       }
       break;
     case "%":
-      // Calcula el porcentaje del valor actual
       if (operador.textContent === "") {
         digito1.textContent = (parseFloat(digito1.textContent) / 100).toString();
       } else {
@@ -130,7 +121,6 @@ calculadora.addEventListener('click', (e) => {
       }
       break;
     case ".":
-      // Agrega el punto decimal si no está presente
       if (operador.textContent === "") {
         if (!digito1.textContent.includes(".")) {
           digito1.append(".");
@@ -141,7 +131,6 @@ calculadora.addEventListener('click', (e) => {
         }
       }
       break;
-    // Maneja los dígitos del 0 al 9
     case "0":
     case "1":
     case "2":
@@ -153,7 +142,12 @@ calculadora.addEventListener('click', (e) => {
     case "8":
     case "9":
       if (operador.textContent === "") {
-        digito1.append(e.target.id);
+        if (res.classList.contains("continue")) {
+          digito1.textContent = e.target.id;
+          res.classList.remove("continue");
+        } else {
+          digito1.append(e.target.id);
+        }
       } else {
         digito2.append(e.target.id);
       }
@@ -161,54 +155,47 @@ calculadora.addEventListener('click', (e) => {
   }
 });
 
-// HISTORIAL
-let c2 = 0; // Inicializamos el contador para el historial
-let hola; // Declaramos la variable para el historial
-// Añadimos un listener para mostrar/ocultar el historial al hacer clic en el botón de historial
+let historyToggleCount = 0;
+let historySection;
 elements.history.addEventListener('click', () => { 
-  const section = document.querySelector("#history-section");
+  const historyContainer = document.querySelector("#history-section");
 
-  if (section) {
-    if (c2 === 0) {
-      // Crea la sección de historial si no existe
-      hola = document.createElement("section");
-      section.appendChild(hola);
-      hola.classList.add("historial");
-      hola.textContent = "Historial de Operaciones:\n";
+  if (historyContainer) {
+    if (historyToggleCount === 0) {
+      historySection = document.createElement("section");
+      historyContainer.appendChild(historySection);
+      historySection.classList.add("historial");
+      historySection.textContent = "Historial de Operaciones:\n";
 
-      // Obtiene las operaciones almacenadas en localStorage y las muestra
-      const ope = JSON.parse(localStorage.getItem("ope") || "[]");
-      ope.forEach(op => {
-        const p = document.createElement("p");
-        p.textContent = `${op[0]} ${op[1]} ${op[2]}`;
-        hola.appendChild(p);
+      const storedOperations = JSON.parse(localStorage.getItem("ope") || "[]");
+      storedOperations.forEach(op => {
+        const operationElement = document.createElement("p");
+        operationElement.textContent = `${op[0]} ${op[1]} ${op[2]}`;
+        historySection.appendChild(operationElement);
       });
       
-      c2 = 1;
-    } else if (c2 === 1) {
-      // Oculta el historial
-      hola.style.display = "none";
-      c2 = 2;
-    } else if (c2 === 2) {
-      // Muestra el historial
-      hola.style.display = "block";
-      c2 = 1;
+      historyToggleCount = 1;
+    } else if (historyToggleCount === 1) {
+      historySection.style.display = "none";
+      historyToggleCount = 2;
+    } else if (historyToggleCount === 2) {
+      historySection.style.display = "block";
+      historyToggleCount = 1;
     }
   }
 });
 
-// Almacena la operación actual en el localStorage
 function storehistorialInLocalStorage(operacionActual) {
-  const ope = JSON.parse(localStorage.getItem("ope") || "[]");
-  ope.push(operacionActual);
-  localStorage.setItem("ope", JSON.stringify(ope));
+  const storedOperations = JSON.parse(localStorage.getItem("ope") || "[]");
+  storedOperations.push(operacionActual);
+  localStorage.setItem("ope", JSON.stringify(storedOperations));
 }
 
-//Note que al digitar ej:
-// 8 * 8; y nuevamente el operador *, no se ejecuta la operacion, pero si es posible cambiar el operador actual. Para ejecutar no queda de otra mas que utilizar el igual.
+//Tratando de corregir un problema, me doy cuenta que no es posible hacerlo con la ayuda de chatGPT.
 
-//quiero que al ocupar el espacio maximo horizontalmente en la pantalla, quiero que se agrege el contenido en una nueva linea y que la pantalla crezca verticalmente respectivamente. En otras palabras, que el ancho de la calculadora no se mueva.
-
-//No se ejecuta correctamente el historial.
-
-//No se ejecuta la multiplicaicon del digito1 o digito2 cuando en este se digita por ejemplo: '8(2)'
+// descripcion del problema:
+/*
+quiero que al digitar 8 + 8 + 8 el resultado(digito1) sea 24.
+Lo que esta sucediendo actualmente, (INCORRECTO), es que se al digitar el 3er '8' este se esta convirtiendo en el digito1.
+la solucion seria que al digitar un operador luego de haber digitado el digito2, se salte el paso del resultado y este se convierta automaticamente el en digito 1, luego si el usuario digita un numero este se concatene con el digito1, si digita un operador este ocupe el espacio del operador,(lo que ocurre actualmente es que al digitar un operador se borra el digito1 y solo queda el operador recien digitado)
+*/
