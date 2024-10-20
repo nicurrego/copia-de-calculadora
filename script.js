@@ -1,55 +1,47 @@
-const clear = document.getElementById("c")
-const parentesis = document.getElementById("( )")
-const porcentaje = document.getElementById("%")
-const dividir = document.getElementById("/")
-const siete = document.getElementById("7")
-const ocho = document.getElementById("8")
-const nueve = document.getElementById("9")
-const multiplicar = document.getElementById("*")
-const cuatro = document.getElementById("4")
-const cinco = document.getElementById("5")
-const seis = document.getElementById("6")
-const restar = document.getElementById("-")
-const uno = document.getElementById("1")
-const dos = document.getElementById("2")
-const tres = document.getElementById("3")
-const sumar = document.getElementById("+")
-const nose = document.getElementById("+/-")
-const cero = document.getElementById("0")
-const decimal = document.getElementById(".")
-const igual = document.getElementById("=")
-const history = document.getElementById("history")
-const digito1 = document.getElementById("n1") // color salmon
-const operador = document.getElementById("operador") // color greenyellow
-const digito2 = document.getElementById("n2") // color violeta
+const buttons = ["c", "( )", "%", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "+/-", "0", ".", "=", "history"];
+const elements = {};
+
+// Selecciona todos los botones por su ID y los almacena en el objeto elements
+buttons.forEach(id => {
+  elements[id] = document.getElementById(id);
+});
+
+const digito1 = document.getElementById("n1"); // color salmon
+const operador = document.getElementById("operador"); // color greenyellow
+const digito2 = document.getElementById("n2"); // color violeta
 const calculadora = document.querySelector("div.calculadora");
-const res = document.getElementById("resultado")
+const res = document.getElementById("resultado");
 const contenidoHistorial = [];
 
-function operar(n1, simbolo, n2){
+function operar(n1, simbolo, n2) {
   // Almacena la operación actual en el historial y en el localStorage
   const operacionActual = [n1, simbolo, n2];
   contenidoHistorial.push(operacionActual);
   storehistorialInLocalStorage(operacionActual);
-  
+
   let resultado;
   // Convierte los números de texto a float
-  n1 = parseFloat(n1) 
-  n2 = parseFloat(n2)
+  n1 = parseFloat(n1);
+  n2 = parseFloat(n2);
 
   // Realiza la operación según el símbolo
   switch (simbolo) {
-    case "+": resultado = n1 + n2;
+    case "+":
+      resultado = n1 + n2;
       break;
-    case "-": resultado = n1 - n2;
+    case "-":
+      resultado = n1 - n2;
       break;
-    case "*": resultado = n1 * n2;
+    case "*":
+      resultado = n1 * n2;
       break;
-    case "/": resultado = n1 / n2;
+    case "/":
+      resultado = n2 !== 0 ? n1 / n2 : "Error: División por 0";
       break;
-    default: resultado = "simbolo inexistente";
+    default:
+      resultado = "simbolo inexistente";
       break;
-  } 
+  }
   // Limpia los campos y muestra el resultado
   digito1.textContent = "";
   operador.textContent = "";
@@ -60,7 +52,7 @@ function operar(n1, simbolo, n2){
 }
 
 // OPERACIONES DE CALCULADORA
-let c; // contador para el case ("( )")
+let c = 0; // contador para el manejo de paréntesis
 calculadora.addEventListener('click', (e) => {
   // Si el resultado está presente, reiniciar para una nueva operación
   if (res.classList.contains("continue")) {
@@ -88,23 +80,26 @@ calculadora.addEventListener('click', (e) => {
       operador.textContent = "";
       digito2.textContent = "";
       break;
-    case "=":  
-      // Realiza la operación
-      operar(o.n1, o.operador, o.n2);
+    case "=":
+      // Realiza la operación si todos los valores están presentes
+      if (o.n1 && o.operador && o.n2) {
+        operar(o.n1, o.operador, o.n2);
+      }
       break;
     // Operadores matemáticos
     case "+":
     case "-":
     case "*":
     case "/":
-      if (digito2.textContent !== "") {
-        operar(o.n1, o.operador, o.n2);
-      }
       operador.textContent = e.target.id;
       break;
     case "+/-":
-      // No implementado
-      nose;
+      // Cambia el signo del número
+      if (operador.textContent === "") {
+        digito1.textContent = parseFloat(digito1.textContent) * -1;
+      } else {
+        digito2.textContent = parseFloat(digito2.textContent) * -1;
+      }
       break;
     case "history":
       // Muestra el historial
@@ -112,13 +107,13 @@ calculadora.addEventListener('click', (e) => {
       break;
     case "( )":
       // Maneja la apertura y cierre de paréntesis
-      if (operador.textContent !== "" && c != 1) {
+      if (operador.textContent !== "" && c === 0) {
         digito2.append("(");
         c = 1;
-      } else if (operador.textContent !== "" && c == 1) {
+      } else if (operador.textContent !== "" && c === 1) {
         digito2.append(")");
         c = 0;
-      } else if (operador.textContent === "" && c != 1) {
+      } else if (operador.textContent === "" && c === 0) {
         digito1.append("(");
         c = 1;
       } else {
@@ -127,21 +122,24 @@ calculadora.addEventListener('click', (e) => {
       }
       break;
     case "%":
-      // No está funcionando correctamente
-      if (digito2.textContent !== "") {
-        operar(o.n1, o.operador, o.n2);
-        operador.textContent = "%";
+      // Calcula el porcentaje del valor actual
+      if (operador.textContent === "") {
+        digito1.textContent = (parseFloat(digito1.textContent) / 100).toString();
       } else {
-        operador.textContent = "%";
+        digito2.textContent = (parseFloat(digito2.textContent) / 100).toString();
       }
       break;
     case ".":
-      // Agrega el punto decimal
-      if (digito1.textContent === "") {
-        digito1.append("0.");
+      // Agrega el punto decimal si no está presente
+      if (operador.textContent === "") {
+        if (!digito1.textContent.includes(".")) {
+          digito1.append(".");
+        }
       } else {
-        digito1.append(".");
-      }  
+        if (!digito2.textContent.includes(".")) {
+          digito2.append(".");
+        }
+      }
       break;
     // Maneja los dígitos del 0 al 9
     case "0":
@@ -166,33 +164,36 @@ calculadora.addEventListener('click', (e) => {
 // HISTORIAL
 let c2 = 0; // Inicializamos el contador para el historial
 let hola; // Declaramos la variable para el historial
-history.addEventListener('click', () => { 
-  const section = document.querySelector("section");
+// Añadimos un listener para mostrar/ocultar el historial al hacer clic en el botón de historial
+elements.history.addEventListener('click', () => { 
+  const section = document.querySelector("#history-section");
 
-  if (c2 === 0) {
-    // Crea la sección de historial si no existe
-    hola = document.createElement("section");
-    section.appendChild(hola);
-    hola.classList.add("historial");
-    hola.textContent = "Historial de Operaciones:\n";
+  if (section) {
+    if (c2 === 0) {
+      // Crea la sección de historial si no existe
+      hola = document.createElement("section");
+      section.appendChild(hola);
+      hola.classList.add("historial");
+      hola.textContent = "Historial de Operaciones:\n";
 
-    // Obtiene las operaciones almacenadas en localStorage y las muestra
-    const ope = JSON.parse(localStorage.getItem("ope") || "[]");
-    ope.forEach(op => {
-      const p = document.createElement("p");
-      p.textContent = `${op[0]} ${op[1]} ${op[2]}`;
-      hola.appendChild(p);
-    });
-    
-    c2 = 1;
-  } else if (c2 === 1) {
-    // Oculta el historial
-    hola.style.display = "none";
-    c2 = 2;
-  } else if (c2 === 2) {
-    // Muestra el historial
-    hola.style.display = "block";
-    c2 = 1;
+      // Obtiene las operaciones almacenadas en localStorage y las muestra
+      const ope = JSON.parse(localStorage.getItem("ope") || "[]");
+      ope.forEach(op => {
+        const p = document.createElement("p");
+        p.textContent = `${op[0]} ${op[1]} ${op[2]}`;
+        hola.appendChild(p);
+      });
+      
+      c2 = 1;
+    } else if (c2 === 1) {
+      // Oculta el historial
+      hola.style.display = "none";
+      c2 = 2;
+    } else if (c2 === 2) {
+      // Muestra el historial
+      hola.style.display = "block";
+      c2 = 1;
+    }
   }
 });
 
