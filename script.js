@@ -38,17 +38,18 @@ function operar(n1, simbolo, n2) {
       resultado = "simbolo inexistente";
       break;
   }
+  res.textContent = resultado;
+  res.removeAttribute("id");
+  res.classList.add("continue");
+  // Guardar el resultado para el próximo cálculo continuo
   digito1.textContent = resultado;
   operador.textContent = "";
   digito2.textContent = "";
-  res.textContent = "";
-  res.removeAttribute("id");
-  res.classList.add("continue");
 }
 
 let parenthesesCounter = 0;
 calculadora.addEventListener('click', (e) => {
-  if (res.classList.contains("continue") && e.target.id !== "=" && e.target.id !== "c") {
+  if (res.classList.contains("continue") && e.target.id !== "=" && e.target.id !== "c" && !["+", "-", "*", "/"].includes(e.target.id)) {
     digito1.textContent = res.textContent;
     operador.textContent = "";
     digito2.textContent = "";
@@ -73,13 +74,19 @@ calculadora.addEventListener('click', (e) => {
     case "=":
       if (o.n1 && o.operador && o.n2) {
         operar(o.n1, o.operador, o.n2);
+        // Mostrar solamente el resultado en el campo de resultado
+        operador.textContent = "";
+        digito2.textContent = "";
       }
       break;
     case "+":
     case "-":
     case "*":
     case "/":
-      if (digito2.textContent !== "") {
+      if (res.classList.contains("continue")) {
+        operador.textContent = e.target.id;
+        res.classList.remove("continue");
+      } else if (digito2.textContent !== "") {
         operar(o.n1, o.operador, o.n2);
         operador.textContent = e.target.id;
         digito2.textContent = "";
@@ -96,7 +103,7 @@ calculadora.addEventListener('click', (e) => {
       }
       break;
     case "history":
-      showHistory();
+      toggleHistory();
       break;
     case "( )":
       if (operador.textContent !== "" && parenthesesCounter === 0) {
@@ -157,7 +164,7 @@ calculadora.addEventListener('click', (e) => {
 
 let historyToggleCount = 0;
 let historySection;
-elements.history.addEventListener('click', () => { 
+function toggleHistory() {
   const historyContainer = document.querySelector("#history-section");
 
   if (historyContainer) {
@@ -183,7 +190,7 @@ elements.history.addEventListener('click', () => {
       historyToggleCount = 1;
     }
   }
-});
+}
 
 function storehistorialInLocalStorage(operacionActual) {
   const storedOperations = JSON.parse(localStorage.getItem("ope") || "[]");
@@ -191,11 +198,4 @@ function storehistorialInLocalStorage(operacionActual) {
   localStorage.setItem("ope", JSON.stringify(storedOperations));
 }
 
-//Tratando de corregir un problema, me doy cuenta que no es posible hacerlo con la ayuda de chatGPT.
-
-// descripcion del problema:
-/*
-quiero que al digitar 8 + 8 + 8 el resultado(digito1) sea 24.
-Lo que esta sucediendo actualmente, (INCORRECTO), es que se al digitar el 3er '8' este se esta convirtiendo en el digito1.
-la solucion seria que al digitar un operador luego de haber digitado el digito2, se salte el paso del resultado y este se convierta automaticamente el en digito 1, luego si el usuario digita un numero este se concatene con el digito1, si digita un operador este ocupe el espacio del operador,(lo que ocurre actualmente es que al digitar un operador se borra el digito1 y solo queda el operador recien digitado)
-*/
+// Intente de varias maneras pulir mas el codigo con chatGPT, pero veo que no sera posible sin mi asistencia. 
