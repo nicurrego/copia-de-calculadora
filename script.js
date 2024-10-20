@@ -203,3 +203,12 @@ function storehistorialInLocalStorage(operacionActual) {
   ope.push(operacionActual);
   localStorage.setItem("ope", JSON.stringify(ope));
 }
+
+//Note que al digitar ej:
+// 8 * 8; y nuevamente el operador *, no se ejecuta la operacion, pero si es posible cambiar el operador actual. Para ejecutar no queda de otra mas que utilizar el igual.
+
+//quiero que al ocupar el espacio maximo horizontalmente en la pantalla, quiero que se agrege el contenido en una nueva linea y que la pantalla crezca verticalmente respectivamente. En otras palabras, que el ancho de la calculadora no se mueva.
+
+//No se ejecuta correctamente el historial.
+
+//No se ejecuta la multiplicaicon del digito1 o digito2 cuando en este se digita por ejemplo: '8(2)'

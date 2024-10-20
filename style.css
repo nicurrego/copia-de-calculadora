@@ -1,17 +1,24 @@
-body{
+body {
   display: flex;
   flex-direction: column;
-  background-color: rgb(0, 0, 0);
+  background-color: #000000;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
-section{
+
+section {
   border: 2px solid aqua;
   border-radius: 13px;
   margin: 10px;
   padding: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 15px aqua;
 }
-.pantalla{
+
+.pantalla {
   font-size: 2em;
   display: flex;
   flex-direction: column;
@@ -21,66 +28,78 @@ section{
   color: aqua;
   align-items: flex-end;
 }
-#operador{
+
+#operador {
   color: #ee82eeb6;
 }
-#resultado{
+
+#resultado {
   margin-top: 5px;
-  font-size: .5em;
-  opacity: .7;
+  font-size: 1em;
+  opacity: 0.9;
 }
-#history{
+
+#history {
   margin: 5px 0px;
+  cursor: pointer;
 }
-.calculadora{
+
+.calculadora {
   display: grid;
   width: 100%;
   height: 60%;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.calculadora div{
+.calculadora div {
   cursor: pointer;
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(5, 30, 53, 0.349);
+  background-color: rgba(5, 30, 53, 0.6);
   color: aqua;
   font-weight: bold;
-  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
-div .pink{
+.calculadora div:active {
+  transform: scale(0.9);
+}
+
+div .pink {
   color: #ee82eeb6;
 }
-div .clear{
+
+div .clear {
   color: rgba(245, 53, 53, 0.726);
 }
-div .iqual{
+
+div .iqual {
   background-color: #ee82eeb6;
   color: white;
 }
-.continue{
+
+.continue {
   transition: transform 0.5s ease, opacity 0.5s ease;
-  transform: scale(2); 
+  transform: scale(1.5);
   opacity: 1;
-  transform: translateY(-63px); 
+  transform: translateY(-30px);
 }
+
 .historial {
   color: aqua;
   position: absolute;
   min-height: 100px;
-  background-color: black;
-  width: 172px;
-  top: 50px;
+  background-color: rgba(0, 0, 0, 0.9);
+  width: 200px;
+  top: 100px;
   left: 50px;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px aqua;
+  overflow-y: auto;
 }
-
-/* ELEMENTOS POR SOLUCIONAR */
-/* 
-1. Cuando sumas sin dar igual no funciona correctamente.
-2. Los parentesis se omiten completamente.
-*/
