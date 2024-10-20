@@ -1,95 +1,201 @@
-const clear = document.getElementById("c")
-const parentesis = document.getElementById("( )")
-const porcentaje = document.getElementById("%")
-const dividir = document.getElementById("/")
-const siete = document.getElementById("7")
-const ocho = document.getElementById("8")
-const nueve = document.getElementById("9")
-const multiplicar = document.getElementById("*")
-const cuatro = document.getElementById("4")
-const cinco = document.getElementById("5")
-const seis = document.getElementById("6")
-const restar = document.getElementById("-")
-const uno = document.getElementById("1")
-const dos = document.getElementById("2")
-const tres = document.getElementById("3")
-const sumar = document.getElementById("+")
-const nose = document.getElementById("+/-")
-const cero = document.getElementById("0")
-const decimal = document.getElementById(".")
-const igual = document.getElementById("=")
-const history = document.getElementById("history")
-const digito = document.querySelector("span")
+const buttons = ["c", "( )", "%", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "+/-", "0", ".", "=", "history"];
+const elements = {};
+
+buttons.forEach(id => {
+  elements[id] = document.getElementById(id);
+});
+
+const digito1 = document.getElementById("n1");
+const operador = document.getElementById("operador");
+const digito2 = document.getElementById("n2");
 const calculadora = document.querySelector("div.calculadora");
+const res = document.getElementById("resultado");
+const contenidoHistorial = [];
 
+function operar(n1, simbolo, n2) {
+  const operacionActual = [n1, simbolo, n2];
+  contenidoHistorial.push(operacionActual);
+  storehistorialInLocalStorage(operacionActual);
 
-console.log(siete);
+  let resultado;
+  n1 = parseFloat(n1);
+  n2 = parseFloat(n2);
 
-function operar(n1, simbolo, n2){
-  {
-    let resultado;
-    switch (simbolo) {
-      case "+": resultado = n1 + n2;
+  switch (simbolo) {
+    case "+":
+      resultado = n1 + n2;
       break;
-      case "-": resultado = n1 - n2;
+    case "-":
+      resultado = n1 - n2;
       break;
-      case "*": resultado = n1 * n2;
+    case "*":
+      resultado = n1 * n2;
       break;
-      case "/": resultado = n1 / n2;
-      break
-      default: resultado = "simbolo inexistente"
-      break
-    } 
-    console.log(resultado)
+    case "/":
+      resultado = n2 !== 0 ? n1 / n2 : "Error: División por 0";
+      break;
+    default:
+      resultado = "simbolo inexistente";
+      break;
+  }
+  res.textContent = resultado;
+  res.removeAttribute("id");
+  res.classList.add("continue");
+  // Guardar el resultado para el próximo cálculo continuo
+  digito1.textContent = resultado;
+  operador.textContent = "";
+  digito2.textContent = "";
+}
+
+let parenthesesCounter = 0;
+calculadora.addEventListener('click', (e) => {
+  if (res.classList.contains("continue") && e.target.id !== "=" && e.target.id !== "c" && !["+", "-", "*", "/"].includes(e.target.id)) {
+    digito1.textContent = res.textContent;
+    operador.textContent = "";
+    digito2.textContent = "";
+    res.textContent = "";
+    res.id = "resultado";
+    res.classList.remove("continue");
+  }
+
+  const o = {
+    n1: digito1.textContent,
+    operador: operador.textContent,
+    n2: digito2.textContent
+  };
+
+  switch (e.target.id) {
+    case "c":
+      res.textContent = "";
+      digito1.textContent = "";
+      operador.textContent = "";
+      digito2.textContent = "";
+      break;
+    case "=":
+      if (o.n1 && o.operador && o.n2) {
+        operar(o.n1, o.operador, o.n2);
+        // Mostrar solamente el resultado en el campo de resultado
+        operador.textContent = "";
+        digito2.textContent = "";
+      }
+      break;
+    case "+":
+    case "-":
+    case "*":
+    case "/":
+      if (res.classList.contains("continue")) {
+        operador.textContent = e.target.id;
+        res.classList.remove("continue");
+      } else if (digito2.textContent !== "") {
+        operar(o.n1, o.operador, o.n2);
+        operador.textContent = e.target.id;
+        digito2.textContent = "";
+        res.textContent = "";
+      } else {
+        operador.textContent = e.target.id;
+      }
+      break;
+    case "+/-":
+      if (operador.textContent === "") {
+        digito1.textContent = parseFloat(digito1.textContent) * -1;
+      } else {
+        digito2.textContent = parseFloat(digito2.textContent) * -1;
+      }
+      break;
+    case "history":
+      toggleHistory();
+      break;
+    case "( )":
+      if (operador.textContent !== "" && parenthesesCounter === 0) {
+        digito2.append("(");
+        parenthesesCounter = 1;
+      } else if (operador.textContent !== "" && parenthesesCounter === 1) {
+        digito2.append(")");
+        parenthesesCounter = 0;
+      } else if (operador.textContent === "" && parenthesesCounter === 0) {
+        digito1.append("(");
+        parenthesesCounter = 1;
+      } else {
+        digito1.append(")");
+        parenthesesCounter = 0;
+      }
+      break;
+    case "%":
+      if (operador.textContent === "") {
+        digito1.textContent = (parseFloat(digito1.textContent) / 100).toString();
+      } else {
+        digito2.textContent = (parseFloat(digito2.textContent) / 100).toString();
+      }
+      break;
+    case ".":
+      if (operador.textContent === "") {
+        if (!digito1.textContent.includes(".")) {
+          digito1.append(".");
+        }
+      } else {
+        if (!digito2.textContent.includes(".")) {
+          digito2.append(".");
+        }
+      }
+      break;
+    case "0":
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+    case "8":
+    case "9":
+      if (operador.textContent === "") {
+        if (res.classList.contains("continue")) {
+          digito1.textContent = e.target.id;
+          res.classList.remove("continue");
+        } else {
+          digito1.append(e.target.id);
+        }
+      } else {
+        digito2.append(e.target.id);
+      }
+      break;
+  }
+});
+
+let historyToggleCount = 0;
+let historySection;
+function toggleHistory() {
+  const historyContainer = document.querySelector("#history-section");
+
+  if (historyContainer) {
+    if (historyToggleCount === 0) {
+      historySection = document.createElement("section");
+      historyContainer.appendChild(historySection);
+      historySection.classList.add("historial");
+      historySection.textContent = "Historial de Operaciones:\n";
+
+      const storedOperations = JSON.parse(localStorage.getItem("ope") || "[]");
+      storedOperations.forEach(op => {
+        const operationElement = document.createElement("p");
+        operationElement.textContent = `${op[0]} ${op[1]} ${op[2]}`;
+        historySection.appendChild(operationElement);
+      });
+      
+      historyToggleCount = 1;
+    } else if (historyToggleCount === 1) {
+      historySection.style.display = "none";
+      historyToggleCount = 2;
+    } else if (historyToggleCount === 2) {
+      historySection.style.display = "block";
+      historyToggleCount = 1;
+    }
   }
 }
 
-calculadora.addEventListener('click', (e) =>{
-  console.log(e.target.id);
-  switch (e.target.id) {
-    case "c":  digito.textContent = "";
-    break;
-    case "=":  operar();
-    break;
-    case "+":  digito.append("+");
-    break;
-    case "-":  digito.append("-");
-    break;
-    case "*":  digito.append("*");
-    break;
-    case "/":  digito.append("/");
-    break;
-    case "+/-":  nose;
-    break;
-    case "history":  showHistory();
-    break;
-    case "( )":  digito.append("()"); //corregir para que sea uno de apertura y uno de cierre.
-    break;
-    case "%":  digito.append("%"); 
-    break;
-    case ".":  digito.append(".");  
-    break;
-    case "0":  digito.append("0");
-    break;
-    case "1":  digito.append("1");
-    break;
-    case "2":  digito.append("2");
-    break;
-    case "3":  digito.append("3");
-    break;
-    case "4":  digito.append("4");
-    break;
-    case "5":  digito.append("5");
-    break;
-    case "6":  digito.append("6");
-    break;
-    case "7":  digito.append("7");
-    break;
-    case "8":  digito.append("8");
-    break;
-    case "9":  digito.append("9");
-    break;
-  }
-})
+function storehistorialInLocalStorage(operacionActual) {
+  const storedOperations = JSON.parse(localStorage.getItem("ope") || "[]");
+  storedOperations.push(operacionActual);
+  localStorage.setItem("ope", JSON.stringify(storedOperations));
+}
 
-const vamos = digito.append("")
+// Intente de varias maneras pulir mas el codigo con chatGPT, pero veo que no sera posible sin mi asistencia. 
